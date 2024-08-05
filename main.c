@@ -339,37 +339,38 @@ void instructions() {
     y = (opcode & 0x00F0) >> 4;
     switch (opcode & 0x000F) {
     case 0x0000:
-      pc += 2;
       V[x] = V[y];
+      pc += 2;
       break;
     case 0x0001:
-      pc += 2;
       V[x] |= V[y];
+      pc += 2;
       break;
     case 0x0002:
-      pc += 2;
       V[x] &= V[y];
+      pc += 2;
       break;
     case 0x0003:
-      pc += 2;
       V[x] ^= V[y];
+      pc += 2;
       break;
     case 0x0004:
       if (V[y] + V[x] > 255)
         V[0xF] = 1;
       else
         V[0xF] = 0;
-      pc += 2;
       V[x] += V[y];
       V[x] &= 0xFF;
+      pc += 2;
       break;
     case 0x0005:
-      pc += 2;
-      if (V[x] >= V[y])
+      if (V[x] > V[y]) {
         V[0xF] = 1;
-      else
+      } else {
         V[0xF] = 0;
+      }
       V[x] -= V[y];
+      pc += 2;
       break;
     case 0x0006:
       V[0xF] = V[x] & 0x1;
@@ -391,6 +392,7 @@ void instructions() {
       pc += 2;
       break;
     }
+    break;
   case 0x9000:
     x = (opcode & 0x0F00) >> 8;
     y = (opcode & 0x00F0) >> 4;

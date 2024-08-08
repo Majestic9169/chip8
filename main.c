@@ -276,6 +276,18 @@ void instructions() {
   printf(" 0x%X   0x%X\n", pc, opcode);
   switch (opcode & 0xF000) {
   case 0x0000:
+    switch (opcode & 0x00F0) {
+    case 0x00C0:
+      /* n = opcode & 0x1; */
+      /* for (int i = 0; i < 64; i++) { */
+      /*   for (int j = 27; j > 0; j--) { */
+      /*     display[(j * 32) + i] = display[((j + 4) * 32) + i]; */
+      /*   } */
+      /* } */
+      /* draw = 1; */
+      pc += 2;
+      break;
+    }
     switch (opcode & 0x000F) {
     case 0x000E:
       printf("  RET\n");
@@ -293,13 +305,10 @@ void instructions() {
     break;
   case 0x1000:
     pc = (opcode << 4 & 0x0FFF0) >> 4;
-    printf("  JP addr to 0x%X\n", (opcode << 4 & 0x0FFF0) >> 4);
     break;
   case 0x2000:
     *(++sp) = pc + 2;
     pc = opcode & 0x0FFF;
-    printf("  CALL addr 0x%X\n", pc);
-    printf("   SP = %X\n", *sp);
     break;
   case 0x3000:
     x = (opcode & 0x0F00) >> 8;
@@ -355,12 +364,13 @@ void instructions() {
       pc += 2;
       break;
     case 0x0004:
-      if (V[y] + V[x] > 255)
+      int temp = V[x] + V[y];
+      V[x] += V[y];
+      V[x] &= 0xFF;
+      if (temp > 255)
         V[0xF] = 1;
       else
         V[0xF] = 0;
-      V[x] += V[y];
-      V[x] &= 0xFF;
       pc += 2;
       break;
     case 0x0005:
@@ -378,12 +388,12 @@ void instructions() {
       pc += 2;
       break;
     case 0x0007:
-      pc += 2;
-      if (V[x] > V[y])
+      V[x] = V[y] - V[x];
+      if (V[x] < 0)
         V[0xF] = 0;
       else
         V[0xF] = 1;
-      V[x] = V[y] - V[x];
+      pc += 2;
       break;
     case 0x000E:
       V[0xF] = (V[x] & 0x80) >> 7;
@@ -410,10 +420,10 @@ void instructions() {
     pc = nnn + V[0];
     break;
   case 0xC000:
-    x = (opcode & 0x0F00 >> 8);
+    x = (opcode & 0x0F00) >> 8;
     nn = opcode & 0x00FF;
-    srand(time(0));
-    V[x] = (rand() % 256) & nn;
+    uint8_t random = rand();
+    V[x] = random & nn;
     pc += 2;
     break;
   case 0xD000:
@@ -453,6 +463,7 @@ void instructions() {
       pc += 2;
       break;
     }
+    break;
   case 0xF000:
     switch (opcode & 0x00FF) {
     case 0x0007:
@@ -512,10 +523,12 @@ void instructions() {
       pc += 2;
       break;
     }
+    break;
   }
 }
 
 int main(int argc, char **argv) {
+  srand(time(0));
   if (argc < 2) {
     printf(" NO ROM PASSED\n");
     exit(EXIT_FAILURE);
@@ -529,7 +542,6 @@ int main(int argc, char **argv) {
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
   rom_name = argv[1];
-  printf(" ROM NAME is %s\n", rom_name);
 
   init_emu();
 
@@ -538,10 +550,10 @@ int main(int argc, char **argv) {
 
   while (playing) {
 
-    for (int i = 0; i < 7000; i++) {
+    for (int i = 0; i < 60; i++) {
       instructions();
-      handle_input();
     }
+    SDL_Delay(1000 / 60);
 
     if (draw == 1) {
       for (int i = 0; i < 64 * 32; i++) {
@@ -560,6 +572,8 @@ int main(int argc, char **argv) {
       SDL_RenderPresent(renderer);
       draw = 0;
     }
+
+    handle_input();
 
     if (delay > 0)
       delay--;

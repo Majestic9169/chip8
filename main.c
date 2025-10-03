@@ -1,3 +1,4 @@
+#include "utils.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_keycode.h>
@@ -10,12 +11,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-// Macros
 #define WINDOW_WIDTH 64 * 10
 #define WINDOW_HEIGHT 32 * 10
 
-// global variables
-// chip8 mem
 uint8_t ram[4096] = {0};
 uint8_t V[16] = {0};
 uint16_t I = 0;
@@ -32,38 +30,16 @@ int playing = 1;
 
 int x, y, n, nn, nnn = 0;
 
-const char *rom_name;
-
-int init_emu() {
+int init_emu(char *rom_name) {
   pc = 0x200;
-  const char font[] = {
-      0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-      0x20, 0x60, 0x20, 0x20, 0x70, // 1
-      0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-      0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-      0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-      0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-      0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-      0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-      0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-      0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-      0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-      0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-      0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-      0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-      0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-      0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-  };
-  for (int i = 0; i < sizeof(font); i++) {
-    ram[i] = font[i];
-  }
 
-  printf(" FONT HAS BEEN LOADED TILL ADDRESS %lu (dec)\n", sizeof(font));
+  load_font(ram);
 
   // open rom
   FILE *rom = fopen(rom_name, "rb");
   if (!rom) {
-    printf(" ROM File is invalid\n");
+    printf("ERROR: unable to open rom file %s\n", rom_name);
+    exit(1);
   }
 
   // get file size (why is it this complicated)
@@ -121,7 +97,7 @@ void handle_input() {
         playing = 0;
         return;
       case SDLK_BACKSPACE:
-        init_emu();
+        /* init_emu(); */
         break;
 
       case SDLK_1:
@@ -541,9 +517,7 @@ int main(int argc, char **argv) {
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-  rom_name = argv[1];
-
-  init_emu();
+  init_emu(argv[1]);
 
   clear_screen(renderer);
   /* SDL_RenderPresent(renderer); */

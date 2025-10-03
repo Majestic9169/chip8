@@ -6,7 +6,7 @@ I started making this like 2 weeks ago, it was a good first introduction to usin
 
 the executable binary is already included, you can run 
 
-```
+```bash
 ./chip8 hbd.ch8
 ```
 to execute the ROM
@@ -19,13 +19,16 @@ make sure you have SDL2 installed
 
 on arch linux you can install with 
 
-```
+```bash
 sudo pacman -S sdl2
 ```
 
 then compile with 
-```
+```bash
 gcc -ggdb main.c -lSDL2 -lSDL2main -o chip8 -Wall
 ```
+or just 
 
-
+```bash
+make
+```

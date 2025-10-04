@@ -1,2 +1,11 @@
-all: main.c utils.h utils.c emu.h emu.c
-	gcc -Wall -ggdb main.c utils.c utils.h emu.h emu.c -lSDL2 -lSDL2main -o chip8
+INC_FILES := $(wildcard inc/*.h)
+SRC_FILES := $(wildcard src/*.c)
+
+chip8: main.c ${INC_FILES} ${SRC_FILES}
+	gcc -Wall -ggdb -lSDL2 -lSDL2main -o chip8 $^
+
+run: 
+	./chip8 ./roms/hbd.ch8
+
+clean:
+	rm chip8

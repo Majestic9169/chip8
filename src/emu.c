@@ -370,17 +370,16 @@ void instructions() {
     break;
   // DRW Vx, Vy, n
   case 0xD000:
-    printf("DRW V[%x], V[%x], 0x%02x\n", x, y, nn);
+    printf("DRW V[%x], V[%x], %x\n", x, y, n);
     V[0xF] = 0;
     for (int i = 0; i < n; i++) {
       uint8_t pixel8 = RAM[I + i];
+      uint8_t row = (V[y] + i) % HEIGHT;
       for (int j = 0; j < 8; j++) {
-        // coordinate Vx, Vy means byte display[V[y] * 64 + V[x]]
-        // one byte is smthg like 10101101 which means
-        if ((display[(V[y] + i) * 64 + V[x] + j] == 1) &&
-            (pixel8 >> (7 - j) == 1))
+        uint8_t col = (V[x] + j) % WIDTH;
+        if (display[row * WIDTH + col] == 1 && (pixel8 >> (7 - j)) == 1)
           V[0xF] = 1;
-        display[(V[y] + i) * 64 + V[x] + j] ^= (pixel8 >> (7 - j)) & 1;
+        display[row * WIDTH + col] ^= (pixel8 >> (7 - j)) & 1;
       }
     }
     draw = 1;

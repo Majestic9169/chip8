@@ -2,6 +2,10 @@
 
 I started making this like 2 weeks ago, it was a good first introduction to using graphics with C and I enjoyed learning more about the CHIP-8 emulator
 
+update: 5/10/25 TEST ROM PASSES!!!
+
+![test](./test_rom.png)
+
 ## usage 
 
 the executable binary is already included, you can run 

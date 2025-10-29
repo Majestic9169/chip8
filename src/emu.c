@@ -8,6 +8,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 // === GLOBALS ===
 
@@ -116,30 +117,43 @@ void handle_input(char *rom_name) {
         break;
       case SDLK_2:
         keypad[0x2] = 1;
+        break;
       case SDLK_3:
         keypad[0x3] = 1;
+        break;
       case SDLK_4:
         keypad[0xC] = 1;
+        break;
       case SDLK_q:
         keypad[0x4] = 1;
+        break;
       case SDLK_w:
         keypad[0x5] = 1;
+        break;
       case SDLK_e:
         keypad[0x6] = 1;
+        break;
       case SDLK_r:
         keypad[0xD] = 1;
+        break;
       case SDLK_a:
         keypad[0x7] = 1;
+        break;
       case SDLK_s:
         keypad[0x8] = 1;
+        break;
       case SDLK_d:
         keypad[0x9] = 1;
+        break;
       case SDLK_f:
         keypad[0xE] = 1;
+        break;
       case SDLK_z:
         keypad[0xA] = 1;
+        break;
       case SDLK_x:
         keypad[0x0] = 1;
+        break;
       case SDLK_c:
         keypad[0xB] = 1;
         break;
@@ -410,15 +424,18 @@ void instructions() {
       V[x] = delay;
       break;
     // LD Vx, K
-    case 0x0A:
+    case 0x0A: {
       for (int i = 0; i < 16; i++) {
         if (keypad[i] == 1) {
-          printf("LD V[%x], K(%x)\n", x, i);
+          printf("LD V[%x], K(%x)", x, i);
           V[x] = i;
+          pc += 2;
           break;
         }
       }
-      break;
+      printf("\n");
+      pc -= 2;
+    } break;
     // LD DT, Vx
     case 0x15:
       printf("LD DT(0x%02x), V[%x]\n", delay, x);
